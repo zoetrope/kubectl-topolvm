@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -32,7 +31,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		nodes, err := client.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+		nodes, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
 		if err != nil {
 			return err
 		}
