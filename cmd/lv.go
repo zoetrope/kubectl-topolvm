@@ -6,9 +6,7 @@ import (
 
 	topolvmv1 "github.com/cybozu-go/topolvm/api/v1"
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
-	cmdutil "k8s.io/kubectl/pkg/cmd/util"
+	"github.com/zoetrope/kubectl-topolvm/pkg"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -23,22 +21,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		flagSet := cmd.PersistentFlags()
-		cfgFlags := genericclioptions.NewConfigFlags(true)
-		cfgFlags.AddFlags(flagSet)
-		matchVersionFlags := cmdutil.NewMatchVersionFlags(cfgFlags)
-		factory := cmdutil.NewFactory(matchVersionFlags)
-
-		restCfg, err := factory.ToRESTConfig()
-		if err != nil {
-			return err
-		}
-		crScheme := runtime.NewScheme()
-		err = topolvmv1.AddToScheme(crScheme)
-		if err != nil {
-			return err
-		}
-		cli, err := client.New(restCfg, client.Options{Scheme: crScheme})
+		cli, err := pkg.LogicalVolumeClient(cmd.PersistentFlags())
 		if err != nil {
 			return err
 		}
