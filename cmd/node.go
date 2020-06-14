@@ -38,34 +38,12 @@ to quickly create a Cobra application.`,
 					if err != nil {
 						return err
 					}
-					fmt.Printf("  %s: %s\n", dc, formatBytes(bytes))
+					fmt.Printf("  %s: %s\n", dc, pkg.FormatBytes(bytes))
 				}
 			}
 		}
 		return nil
 	},
-}
-
-var units = []string{
-	"Bytes",
-	"KiB",
-	"MiB",
-	"GiB",
-	"TiB",
-	"PiB",
-	"EiB",
-}
-
-func formatBytes(bytes uint64) string {
-	count := 0
-	num := float64(bytes)
-	for ; ; count++ {
-		if num < 1024 {
-			break
-		}
-		num /= 1024
-	}
-	return fmt.Sprintf("%.1f%s", num, units[count])
 }
 
 func init() {

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	topolvmv1 "github.com/cybozu-go/topolvm/api/v1"
 	"github.com/spf13/cobra"
@@ -32,11 +31,7 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		for _, lv := range lvlist.Items {
-			fmt.Println(lv.Name)
-		}
-
-		return nil
+		return pkg.PrintLVList(&lvlist)
 	},
 }
 
