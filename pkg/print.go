@@ -46,3 +46,32 @@ func PrintLVList(lvlist *topolvmv1.LogicalVolumeList) error {
 	}
 	return w.Flush()
 }
+
+func PrintSummary(summary *Summary) error {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	columnNames := []string{"NAME"}
+	for _, dc := range summary.DeviceClasses {
+		columnNames = append(columnNames, strings.ToUpper(dc))
+	}
+	_, err := fmt.Fprintf(w, "%s\n", strings.Join(columnNames, "\t"))
+	if err != nil {
+		return err
+	}
+	for _, node := range summary.Nodes {
+		_, err := fmt.Fprintf(w, "%s", node.Name)
+		if err != nil {
+			return err
+		}
+		for _, dc := range summary.DeviceClasses {
+			_, err = fmt.Fprintf(w, "\t%s/%s", FormatBytes(node.Used[dc]), FormatBytes(node.Capacities[dc]))
+			if err != nil {
+				return err
+			}
+		}
+		_, err = fmt.Fprint(w, "\n")
+		if err != nil {
+			return err
+		}
+	}
+	return w.Flush()
+}

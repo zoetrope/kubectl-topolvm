@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zoetrope/kubectl-topolvm/pkg"
@@ -32,20 +29,12 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		for _, node := range nodes.Items {
-			fmt.Println(node.Name)
-			for k, v := range node.Annotations {
-				if strings.HasPrefix(k, "capacity.topolvm.cybozu.com/") {
-					dc := k[len("capacity.topolvm.cybozu.com/"):]
-					bytes, err := strconv.ParseUint(v, 10, 64)
-					if err != nil {
-						return err
-					}
-					fmt.Printf("  %s: %s\n", dc, pkg.FormatBytes(bytes))
-				}
-			}
+		summary, err := pkg.Summarize(cli)
+		if err != nil {
+			return err
 		}
-		return nil
+		err = pkg.PrintSummary(summary)
+		return err
 	},
 }
 
