@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zoetrope/kubectl-topolvm/pkg"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // nodesCmd represents the nodes command
@@ -21,11 +23,12 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := pkg.KubernetesClient(cmd.PersistentFlags())
+		cli, err := pkg.KubernetesClient(cmd.PersistentFlags())
 		if err != nil {
 			return err
 		}
-		nodes, err := client.CoreV1().Nodes().List(metav1.ListOptions{})
+		nodes := corev1.NodeList{}
+		err = cli.List(context.Background(), &nodes, &client.ListOptions{})
 		if err != nil {
 			return err
 		}

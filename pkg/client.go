@@ -5,12 +5,12 @@ import (
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/kubernetes/scheme"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func LogicalVolumeClient(flagSet *pflag.FlagSet) (client.Client, error) {
+func KubernetesClient(flagSet *pflag.FlagSet) (client.Client, error) {
 	cfgFlags := genericclioptions.NewConfigFlags(true)
 	cfgFlags.AddFlags(flagSet)
 	matchVersionFlags := cmdutil.NewMatchVersionFlags(cfgFlags)
@@ -20,26 +20,18 @@ func LogicalVolumeClient(flagSet *pflag.FlagSet) (client.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	crScheme := runtime.NewScheme()
-	err = topolvmv1.AddToScheme(crScheme)
+	scm := runtime.NewScheme()
+	err = topolvmv1.AddToScheme(scm)
 	if err != nil {
 		return nil, err
 	}
-	cli, err := client.New(restCfg, client.Options{Scheme: crScheme})
+	err = scheme.AddToScheme(scm)
+	if err != nil {
+		return nil, err
+	}
+	cli, err := client.New(restCfg, client.Options{Scheme: scm})
 	if err != nil {
 		return nil, err
 	}
 	return cli, nil
-}
-
-func KubernetesClient(flagSet *pflag.FlagSet) (*kubernetes.Clientset, error) {
-	cfgFlags := genericclioptions.NewConfigFlags(true)
-	cfgFlags.AddFlags(flagSet)
-	matchVersionFlags := cmdutil.NewMatchVersionFlags(cfgFlags)
-	factory := cmdutil.NewFactory(matchVersionFlags)
-	cli, err := factory.KubernetesClientSet()
-	if err != nil {
-		return nil, err
-	}
-	return cli, err
 }
